@@ -3,6 +3,7 @@ package job
 import javaposse.jobdsl.dsl.DslFactory
 import javaposse.jobdsl.dsl.*
 import javaposse.jobdsl.dsl.Job
+import javaposse.jobdsl.dsl.helpers.step.DockerBuildAndPublishContext.*
 
 public class JobBuilder {
 
@@ -288,6 +289,84 @@ public class JobBuilder {
         this
     }
 
+    /**
+     *  This function add env variables to the job context.
+     *  See https://wiki.jenkins-ci.org/display/JENKINS/EnvInject+Plugin
+     *
+     */
+    public JobBuilder addInjectedEnvVariable(Map<Object, Object> map, String propertiesFilePath, boolean debug = false) {
+        if (debug) {
+            // TODO: set something for the debug mode
+            println 'Debug is set to true'
+        }
+        job.steps {
+            environmentVariables{
+                envs(map)
+                propertiesFile(propertiesFilePath)
+            }
+        }
+        this
+    }
+
+    /**
+     *  Use this function to configure docker build and push steps with registry.
+     *  See https://wiki.jenkins-ci.org/display/JENKINS/CloudBees+Docker+Build+and+Publish+plugin
+     *
+     *  @String repoName          Specifies the name of the repository to build
+     *  @String imageTag          A tag for the image
+     *  @String dockerRegistry    Sets the URL of the Docker registry
+     *  @String registryCred      The credentials to use for authenticating with the Docker registry
+     *  @String buildContextPath  Specifies the project root path for the build
+     *  @String buildArgs         Specifies additional build arguments passed to docker build
+     *  @String dockerfilePath    Sets the directory containing the Dockerfile
+     */
+    public JobBuilder addDockerBuildAndPublish(String repoName,
+                                               String imageTag,
+                                               String dockerRegistry,
+                                               String registryCred,
+                                               String buildContextPath,
+                                               String buildArgs,
+                                               String dockerfilePath,
+                                               boolean debug = false) {
+        if (debug) {
+            // TODO: set something for the debug mode
+            println 'Debug is set to true'
+        }
+        job.steps() {
+            dockerBuildAndPublish{
+                repositoryName(repoName)
+                tag(imageTag)
+                dockerRegistryURL(dockerRegistry)
+                registryCredentials(registryCred)
+                buildContext(buildContextPath)
+                additionalBuildArgs(buildArgs)
+                dockerfileDirectory(dockerfilePath)
+            }
+        }
+        this
+    }
+
+    /**
+     *  Use this function to attach built artifact to the current job.
+     *
+     *  @artifacts - files you want to archive
+     */
+
+    public JobBuilder addArchiveArtifacts(ArrayList<String> artifacts, boolean debug = false) {
+        if (debug) {
+            // TODO: set something for the debug mode
+            println 'Debug is set to true'
+        }
+        job.publishers {
+            archiveArtifacts{
+                for (int i = 0; i < artifacts.size(); i++) {
+                    pattern(artifacts[i])
+                }
+                onlyIfSuccessful()
+            }
+        }
+        this
+    }
     /**
      *
      * @return ?

@@ -9,6 +9,8 @@ ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
 ENV http_proxy ${http_proxy:-}
 ENV https_proxy ${https_proxy:-}
 ENV no_proxy ${no_proxy:-}
+ARG JAVA_OPTS
+ENV JAVA_OPTS ${JAVA_OPTS:-}
 
 # install docker
 RUN apk update && apk add curl && curl -o docker-1.11.0.tgz https://get.docker.com/builds/Linux/x86_64/docker-1.11.0.tgz && tar zxvf docker-1.11.0.tgz && mv docker/* /usr/bin/ && rm -rf docker-*
